@@ -2,12 +2,15 @@
 <html>
 
 <head>
+
 	<title>Basil Benny | Portfolio</title>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 	<meta name="description" content="" />
 	<meta name="keywords" content="" />
 	<link rel="stylesheet" href="assets/css/main.css" />
+	<script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-database.js"></script>
 </head>
 
 <body class="is-preload">
@@ -152,6 +155,44 @@
 				<section>
 					<header>
 						<h2>Android</h2>
+						<h3>Stories by pete</h3>
+						<p>Stories by Pete is a story-reading application built using Android Studio, java, and
+							Firebase
+							as the backend. The application displays the stories uploaded in the Firebase
+							realtime
+							database, rather than this, the application provides a special feature that plays
+							the story
+							as audio.</p>
+
+					</header>
+
+					<div class="content">
+						<div class="gallery">
+							<a href="images/gallery/fulls/8 SP.jpg"><img src="images/gallery/thumbs/8 SP.jpg"
+									alt="" /></a>
+							<a href="images/gallery/fulls/9 SP.jpg"><img src="images/gallery/thumbs/9 SP.jpg"
+									alt="" /></a>
+
+							<a href="images/gallery/fulls/10 SP.jpg"><img src="images/gallery/thumbs/10 SP.jpg"
+									alt="" /></a>
+							<!-- video-->
+
+						</div>
+					</div>
+
+				</section>
+				<div id="stories" class="content">
+					<p><b>Download</b> Stories by Pete?</p>
+					<ul class="actions">
+						<li><a href="/assets/Stories By Pete.apk" target="_blank" class="button primary large"
+								id="downloadButton">Stories by Pete.apk</a></li>
+
+					</ul>
+					<p>Number of Downloads : <span id="downloadCount"><b></b></span></p>
+				</div>
+				<section>
+					<header>
+
 						<h3>Object Scanner</h3>
 						<p>Object Scanner is an android application capable of providing QR coded Tags, which can be
 							placed in the phone case, as a locket in the pet's belt, or as stickers in accessories, when
@@ -181,38 +222,11 @@
 
 						</div>
 					</div>
+
 				</section>
 
 				<!-- Section -->
-				<section>
-					<header>
-						<h3>Gate Authenticator</h3>
-						<p>An Android application capable of providing entry and exit to a campus setup via QR-coded
-							Tokens, Which can be generated, Verified, and Approved by the same application.</p>
-					</header>
-					<div class="content">
-						<div class="gallery">
-							<!--
-							<a href="images/gallery/fulls/05.jpg" class="landscape"><img
-									src="images/gallery/thumbs/05.jpg" alt="" /></a>
-							-->
-							<a href="images/gallery/fulls/ga 1.jpg"><img src="images/gallery/thumbs/ga 1.jpg"
-									alt="" /></a>
-							<a href="images/gallery/fulls/ga 2.jpg"><img src="images/gallery/thumbs/ga 2.jpg"
-									alt="" /></a>
 
-							<a href="images/gallery/fulls/ga 3.jpg"><img src="images/gallery/thumbs/ga 3.jpg"
-									alt="" /></a>
-							<a href="images/gallery/fulls/ga 4.jpg"><img src="images/gallery/thumbs/ga 4.jpg"
-									alt="" /></a>
-
-							<a href="images/gallery/fulls/ga 5.jpg"><img src="images/gallery/thumbs/ga 5.jpg"
-									alt="" /></a>
-							<a href="images/gallery/fulls/ga 6.jpg"><img src="images/gallery/thumbs/ga 6.jpg"
-									alt="" /></a>
-						</div>
-					</div>
-				</section>
 
 				<!-- Section -->
 
@@ -229,7 +243,8 @@
 			<div class="content">
 				<p>Apart from these, I've done more projects, Welcome to Explore my Projects.</p>
 				<ul class="actions">
-					<li><a href="projects.html" class="button primary large">Projects Gallery</a></li>
+					<li><a href="projects.html" id="downloadButton" class="button primary large">Projects Gallery</a>
+					</li>
 
 				</ul>
 			</div>
@@ -599,12 +614,72 @@ print 'Sorted in ' + i + ' iterations.';</code></pre>
 	</div>
 
 	<!-- Scripts -->
+	<script type="module">
+
+		// Firebase configuration
+		import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
+		const firebaseConfig = {
+			apiKey: "AIzaSyDd7v1tGWjxQ07pZxu6s_D6Rsi22N3_beA",
+			authDomain: "portfolio-site-73209.firebaseapp.com",
+			databaseURL: "https://portfolio-site-73209-default-rtdb.firebaseio.com",
+			projectId: "portfolio-site-73209",
+			storageBucket: "portfolio-site-73209.appspot.com",
+			messagingSenderId: "144876923007",
+			appId: "1:144876923007:web:a8e90b4e51fd946f8f374a"
+		};
+
+		// Initialize Firebase
+		const app = initializeApp(firebaseConfig);
+		import { getDatabase, ref, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-database.js";
+		const db = getDatabase();
+		const dbRef = ref(db);
+		// Reference to the download count in the database
+		const downloadCountRef = ref(db, 'downloads/data');
+		//const downloadCountRef = firebase.database().ref('downloads/file1');
+		onValue(downloadCountRef, (snapshot) => {
+			const data = snapshot.val();
+			document.getElementById('downloadCount').textContent = data;
+
+		});
+		// Increment download count when button is clicked
+		document.getElementById('downloadButton').addEventListener('click', () => {
+			runTransaction(downloadCountRef, (currentData) => {
+				// Increment the count by 1
+				return (currentData || 0) + 1;
+			}).then((transactionResult) => {
+				// Transaction completed successfully
+				console.log("Transaction successful!");
+			}).catch((error) => {
+				// Transaction failed
+				console.error("Transaction failed abnormally!", error);
+			});
+		});
+
+		// Update download count on the page when it changes in the database
+
+
+
+
+
+	</script>
+	<script>
+		window.addEventListener('DOMContentLoaded', (event) => {
+			const hash = window.location.hash.substr(1); // Get anchor ID from URL
+			const element = document.getElementById(hash); // Get element with matching ID
+			if (element) {
+				setTimeout(() => { // Add a small delay to ensure the page is fully rendered
+					element.scrollIntoView({ behavior: 'smooth' }); // Scroll to the element
+				}, 100);
+			}
+		});
+	</script>
 	<script src="assets/js/jquery.min.js"></script>
 	<script src="assets/js/jquery.scrolly.min.js"></script>
 	<script src="assets/js/browser.min.js"></script>
 	<script src="assets/js/breakpoints.min.js"></script>
 	<script src="assets/js/util.js"></script>
 	<script src="assets/js/main.js"></script>
+
 
 </body>
 
