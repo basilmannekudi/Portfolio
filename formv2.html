@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Join My Party | Basil Benny</title>
+  <link rel="stylesheet" href="assets/formv2.css">
+	<link rel="icon" href="images/favicon.png" type="image/png">
+
+</head>
+
+<body>
+
+<div class="container">
+	<!-- code here -->
+	<div class="card">
+		<div class="card-image">	
+			<h2 class="card-heading">
+                <small><i>"Join me for a little party"</i></small>
+
+				
+				
+			</h2>
+		</div>
+		<form class="card-form" id="myForm">
+			<div class="input">
+				<input type="text" class="input-field" name="Full Name" required/>
+				<label class="input-label">Full name</label>
+			</div>
+						<div class="input">
+				<input type="text" class="input-field" name="Email" required/>
+				<label class="input-label">Email</label>
+			</div>
+            <div class="input">
+				<input type="tel" class="input-field" name="Phone" required/>
+				<label class="input-label">Phone</label>
+			</div>
+			<button class="action-button" id="submitBtn">
+  <span class="btn-text">Get started</span>
+</button>
+
+			</div>
+              <div id="status" style="margin-top: 10px;"></div>
+		</form>
+		<div class="card-info">
+			<p>Please take a look at the <a href="#" id="openTerms">General information</a></p>
+		</div>
+	</div>
+</div>
+<div id="termsModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h3>General information</h3>
+<p>
+  <i> Your data will be handled securely,
+   and you must provide accurate and truthful information.</i> <br> <br>
+
+   Contact Support :
+  <a href="mailto:basilbenny404@gmail.com">basilbenny404@gmail.com</a> <br>
+   Mr. Basil Benny : 015510183507 <br><br>
+
+  
+</p>
+
+  </div>
+</div>
+
+
+<!-- Fullscreen loader overlay -->
+<div id="loaderOverlay" style="display: none;">
+  <div class="loader-wrapper" id="fancyLoader">
+    <div class="loader">
+      <span><span></span><span></span><span></span><span></span></span>
+      <div class="base">
+        <span></span>
+        <div class="face"></div>
+      </div>
+    </div>
+    <div class="longfazers">
+      <span></span><span></span><span></span><span></span>
+    </div>
+     <!-- Your message below the loader -->
+  <div id="loaderMessage">Getting you there...</div>
+  </div>
+</div>
+<!-- Success Modal -->
+<div id="successModal" class="success-modal" style="display: none;">
+   
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h3>Form Complete ✅</h3>
+    <p>Redirecting to homepage in <span id="countdown">5</span> seconds...</p>
+
+    <!-- Circular countdown loader -->
+    <div class="circle-loader">
+      <svg viewBox="0 0 36 36">
+        <path
+          class="circle-bg"
+          d="M18 2.0845
+             a 15.9155 15.9155 0 0 1 0 31.831
+             a 15.9155 15.9155 0 0 1 0 -31.831"
+        />
+        <path
+          id="circleProgress"
+          class="circle"
+          stroke-dasharray="100, 100"
+          d="M18 2.0845
+             a 15.9155 15.9155 0 0 1 0 31.831
+             a 15.9155 15.9155 0 0 1 0 -31.831"
+        />
+      </svg>
+    </div>
+  </div>
+</div>
+
+<script>
+const scriptURL = '';
+const submitBtn = document.getElementById('submitBtn');
+const btnText = submitBtn.querySelector('.btn-text');
+const loader = document.getElementById('fancyLoader');
+const openTermsBtn = document.getElementById('openTerms');
+const termsModal = document.getElementById('termsModal');
+const closeBtn = termsModal.querySelector('.close');
+const loaderOverlay = document.getElementById('loaderOverlay');
+const successModal = document.getElementById('successModal');
+
+window.addEventListener('load', () => {
+termsModal.style.display = 'block';
+});
+
+// Open modal when link is clicked
+openTermsBtn.addEventListener('click', (e) => {
+  e.preventDefault(); // Prevent jumping to top
+  termsModal.style.display = 'block';
+});
+
+// Close modal when (x) is clicked
+closeBtn.addEventListener('click', () => {
+  termsModal.style.display = 'none';
+});
+
+// Close modal when clicking outside the modal content
+window.addEventListener('click', (e) => {
+  if (e.target === termsModal) {
+    termsModal.style.display = 'none';
+  }
+});
+
+
+
+
+document.getElementById('myForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const form = e.target;
+  const formData = new FormData(form);
+ const email = formData.get('Email').trim();
+  const phone = formData.get('Phone').trim();
+
+  // Email validation: must contain '@' and a basic format
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailPattern.test(email)) {
+    document.getElementById('status').textContent = "❌ Please enter a valid email address.";
+    return;
+  }
+
+  // Phone validation: must be digits only and at least 10 characters
+  const phonePattern = /^[0-9]{10,}$/;
+  if (!phonePattern.test(phone)) {
+    document.getElementById('status').textContent = "❌ Please enter a valid phone number (digits only, at least 10 numbers).";
+    return;
+  }
+
+
+  // Show loader and disable button
+  submitBtn.disabled = true;
+  btnText.style.display = 'none';
+  loaderOverlay.style.display = 'flex';
+
+  fetch(scriptURL, {
+    method: 'POST',
+    body: formData
+  })
+  .then(res => res.text())
+  .then(msg => {
+    document.getElementById('status').textContent = "✅ Registration Success!";
+     form.reset();
+  showSuccessModal();
+  })
+  .catch(err => {
+    document.getElementById('status').textContent = "❌ Error!";
+    console.error(err);
+  })
+  .finally(() => {
+    // Hide loader and enable button
+    submitBtn.disabled = false;
+    btnText.style.display = 'inline';
+       loaderOverlay.style.display = 'none';
+  });
+});
+
+function showSuccessModal() {
+  const successModal = document.getElementById('successModal');
+  const closeSuccessBtn = document.querySelector('.close-success');
+  const countdownSpan = document.getElementById('countdown');
+  const circleProgress = document.getElementById('circleProgress');
+  let secondsLeft = 5;
+  let interval;
+  let redirectTimeout;
+
+  successModal.style.display = 'block';
+
+  // Start circular progress and countdown
+  updateProgress(100);
+  countdownSpan.textContent = secondsLeft;
+
+  interval = setInterval(() => {
+    secondsLeft--;
+    if (secondsLeft >= 0) {
+      countdownSpan.textContent = secondsLeft;
+      updateProgress(secondsLeft * 10); // 2 sec = 100%, 1 sec = 50%, 0 sec = 0%
+    }
+  }, 1000);
+
+  // Set redirect after 2 seconds
+  redirectTimeout = setTimeout(() => {
+    window.location.href = 'index.html'; // Change this to your home page
+  }, 5000);
+
+  // Cancel redirect if user closes modal or clicks outside
+  function cancelRedirect() {
+    clearTimeout(redirectTimeout);
+    clearInterval(interval);
+    successModal.style.display = 'none';
+  }
+
+  closeSuccessBtn.onclick = cancelRedirect;
+
+  window.onclick = function (event) {
+    if (event.target === successModal) {
+      cancelRedirect();
+    }
+  };
+
+  function updateProgress(percent) {
+    circleProgress.setAttribute('stroke-dasharray', `${percent}, 100`);
+  }
+}
+
+</script>
+</body>
+</html>
